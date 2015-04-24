@@ -1,0 +1,3 @@
+mysql_log_dir: /var/log/mysql
+ansible_hostname: vagrant-centos65.vagrantup.com
+mysql_password: changeme1234

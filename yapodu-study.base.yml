@@ -1,0 +1,78 @@
+- hosts: all
+  user: vagrant
+  sudo: yes
+
+  vars:
+    root_vim_dir: ~root/.vim/after/plugin/
+    root_vim_common: ~root/.vim/after/plugin/common-settings.vim
+
+  tasks: 
+    - name: "OS設定時RPMのインストール"
+      yum: name={{ item }} state=latest 
+      with_items:
+        - git
+        - bind-utils
+        - ntp
+        - ntpdate
+        - wget
+        - man
+        - gcc
+        - make
+        - sysstat
+        - mlocate
+        - man-pages-ja
+        - traceroute
+        - iotop
+        - vim
+        - tcpdump
+        - dmidecode
+      tags: pkg
+
+    - name: "ntpdate関連ファイル差替"
+      template: src=FILES/ntpdate.ansible dest=/etc/sysconfig/ntpdate mode=0644 backup=yes
+      tags: ntp
+    - name: "ntpd関連ファイル差替"
+      template: src=FILES/ntp.conf.ansible dest=/etc/ntp.conf mode=0644 backup=yes
+      tags: ntp
+
+    - name: "ntpdate起動"
+      service: name=ntpdate state=started enabled=yes
+      tags: ntp
+    - name: "ntpd起動"
+      service: name=ntpd state=started enabled=yes
+      tags: ntp
+
+    - name: "localtimeファイル修正"
+      file: path=/etc/localtime state=absent
+      tags: jst
+    - name: "JST時刻設定"
+      file: src=/usr/share/zoneinfo/Asia/Tokyo dest=/etc/localtime state=link force=yes mode=0644
+      tags: jst
+
+    - name: ".sshコピー"
+      copy: src=SHELL/useradd/.ssh dest=/tmp/
+      tags: "legacy shell script"
+
+    - name: "ユーザー作成スクリプト実行"
+      script: SHELL/useradd/create-user.sh
+      args:
+        creates: /home/yapodu/.ssh/authorized_keys
+      tags: "legacy shell script"
+
+    - name: "root用 vim commonディレクトリ作成"
+      file: dest={{ root_vim_dir }} state=directory
+      tags: vim
+    - name: "root用 vim commonファイル作成"
+      file: dest={{ root_vim_common }} state=touch
+      tags: vim
+    - name: "改行時の自動コメントアウトを無効化"
+      lineinfile: dest={{ root_vim_common }} line="au FileType * setlocal formatoptions-=ro"
+      tags: vim
+
+    - name: "yum update 実行"
+      yum: name=* state=latest
+      tags: pkg
+
+
+
+

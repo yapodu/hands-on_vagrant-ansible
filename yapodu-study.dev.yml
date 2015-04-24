@@ -1,0 +1,7 @@
+- hosts: all
+  user: vagrant 
+
+  roles:
+    - ruby
+    - rails
+    - mysql

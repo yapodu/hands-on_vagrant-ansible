@@ -1,0 +1,30 @@
+"vi との互換性OFF
+set nocompatible
+" ファイル形式の検出を無効にする
+filetype off
+
+" Vundle を初期化
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+" github にあるプラグイン
+" Vundle 自身も Vundle で管理
+Bundle 'gmarik/vundle'
+" 検索結果を複数ハイライト
+Bundle 't9md/vim-quickhl'
+
+" vim-scripts プラグイン
+
+" github にないプラグイン
+
+" ファイル形式検出、プラグイン、インデントを ON
+filetype plugin indent on
+
+
+" vim-quickhl 用のキーマップ設定
+nmap <Space>m <Plug>(quickhl-toggle)
+xmap <Space>m <Plug>(quickhl-toggle)
+nmap <Space>M <Plug>(quickhl-reset)
+xmap <Space>M <Plug>(quickhl-reset)
+nmap <Space>j <Plug>(quickhl-match)
+

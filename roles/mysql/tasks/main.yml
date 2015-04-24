@@ -1,0 +1,91 @@
+    - name: "MySQL repo RPMのインストール"
+      yum: name={{ item }} 
+      with_items:
+        - http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:install
+        - install
+
+    - name: "MySQL Community Server インストール"
+      yum: name={{ item }} state=latest
+      with_items:
+        - mysql-community-server
+        - mysql-community-devel
+        - MySQL-python
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:install
+        - install
+
+    - name: "my.cnf差替"
+      template: src=my.cnf dest=/etc/my.cnf mode=0644 backup=yes
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:install
+        - install
+
+
+    - name: "MySQL ログディレクトリ作成"
+      file: dest={{ mysql_log_dir }} state=directory owner=mysql group=mysql
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:install
+        - install
+
+
+    - name: "mysqld起動"
+      service: name=mysqld state=started enabled=yes
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:install
+        - install
+
+    - name: "mysql_secure_install delete anonymous MySQL server user for localhost"
+      action: mysql_user user="" state="absent"
+      tags: 
+        - mysql
+        - mysql:secure_install
+        - secure_install
+ 
+    - name: "mysql_secure_install remove the MySQL test database"
+      action: mysql_db db=test state=absent
+      tags: 
+        - mysql
+        - mysql:secure_install
+        - secure_install
+   
+    - name: "mysql_secure_install Change root user password on first run"
+      mysql_user: login_user=root
+              login_password=""
+              name=root
+              password={{ mysql_password }}
+              priv=*.*:ALL,GRANT
+              host={{ item }}
+      with_items:
+      - 127.0.0.1
+      - ::1
+      - localhost
+      tags: 
+        - mysql
+        - mysql:secure_install
+        - secure_install
+
+    - name: "innotop RPMのインストール"
+      yum: name={{ item }} 
+      with_items:
+        - innotop
+      sudo: true
+      tags: 
+        - mysql
+        - mysql:tool
+        - tool
+
+
+
+
